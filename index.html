@@ -10,333 +10,49 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-    body { font-family: 'Poppins', sans-serif; }
-    .header-name { font-size: 2.5rem; font-weight: 700; letter-spacing: -2px; }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+    body { font-family: 'Poppins', sans-serif; font-size: 15px; }
+    .header-name-box { background: #111; border: 2px solid #222; border-radius: 16px; padding: 14px 0; }
     .slide-menu { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
     .slide-menu.open { transform: translateX(0); }
-    .torch-toggle {
-      width: 68px; height: 34px; background: #1e3a8a; border-radius: 9999px; position: relative; cursor: pointer; transition: all 0.4s;
-    }
-    .torch-toggle .knob {
-      width: 28px; height: 28px; background: #fff; border-radius: 50%; position: absolute; top: 3px; left: 4px; transition: all 0.4s;
-      display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .dark .torch-toggle { background: #0ea5e9; }
+    .torch-toggle { width: 62px; height: 32px; background: #222; border-radius: 9999px; position: relative; cursor: pointer; }
+    .dark .torch-toggle { background: #444; }
+    .torch-toggle .knob { width: 26px; height: 26px; background: #fff; border-radius: 50%; position: absolute; top: 3px; left: 4px; transition: all 0.4s; display: flex; align-items: center; justify-content: center; }
     .game-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .game-card:hover { transform: translateY(-6px) scale(1.04); }
+    .game-card:hover { transform: scale(1.04); }
+    .show-btn { color: #3b82f6; font-size: 14px; font-weight: 500; }
   </style>
 </head>
-<body class="bg-gray-50 dark:bg-[#001f3f] text-gray-900 dark:text-white min-h-screen">
+<body class="bg-black text-white min-h-screen">
 
   <!-- HEADER -->
-  <header class="bg-white dark:bg-[#0a2a5e] shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
-      
-      <!-- LEFT: Circular Profile -->
-      <button id="profileBtn" class="w-12 h-12 rounded-2xl overflow-hidden border-2 border-blue-600 dark:border-cyan-400 flex items-center justify-center text-3xl bg-white dark:bg-gray-800 shadow-inner">
-        👤
-      </button>
-
-      <!-- RIGHT: Torch Sliding Toggle -->
+  <header class="bg-[#111] shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <button id="profileBtn" class="w-11 h-11 rounded-2xl overflow-hidden border-2 border-white flex items-center justify-center text-3xl">👤</button>
       <div id="themeToggle" class="torch-toggle">
-        <div class="knob" id="toggleKnob">
-          <i id="themeIcon" class="fas fa-torch text-[#001f3f] dark:text-white text-lg"></i>
-        </div>
+        <div class="knob" id="toggleKnob"><i id="themeIcon" class="fas fa-torch text-black"></i></div>
       </div>
     </div>
-
-    <!-- WEBSITE NAME - ALAG HEADING NEeche -->
-    <div class="max-w-7xl mx-auto px-8 pb-6">
-      <h1 class="header-name text-center text-[#001f3f] dark:text-cyan-400">MYA Gaming</h1>
+    <div class="max-w-7xl mx-auto px-6 pb-6">
+      <div class="header-name-box text-center">
+        <h1 class="text-3xl font-semibold tracking-tight">MYA Gaming</h1>
+      </div>
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
-  <div id="mainContent" class="max-w-7xl mx-auto px-8 py-10"></div>
+  <div id="mainContent" class="max-w-7xl mx-auto px-6 py-8"></div>
 
-  <!-- SLIDING PROFILE MENU -->
-  <div id="slideMenu" class="slide-menu fixed top-0 right-0 h-full w-96 bg-white dark:bg-[#0a2a5e] shadow-2xl z-[100] overflow-y-auto p-8">
-    <button id="closeMenu" class="absolute top-6 right-6 text-4xl text-gray-400 hover:text-red-600">✕</button>
-    <h2 class="text-3xl font-bold mb-8 text-center">My Games</h2>
-    <div id="gamesInMenu" class="space-y-8"></div>
-    <button id="logoutBtn" class="mt-12 w-full py-5 bg-red-600 hover:bg-red-700 rounded-3xl text-white font-semibold text-xl">Logout</button>
+  <!-- SLIDING MENU -->
+  <div id="slideMenu" class="slide-menu fixed top-0 right-0 h-full w-80 bg-[#111] shadow-2xl z-[100] p-6 overflow-y-auto">
+    <button id="closeMenu" class="absolute top-6 right-6 text-3xl text-gray-400">✕</button>
+    <div id="menuContent" class="space-y-8 mt-8"></div>
   </div>
 
-  <!-- FLOATING WHATSAPP -->
-  <a id="whatsappFloat" href="#" target="_blank" class="fixed bottom-8 right-8 bg-green-500 hover:bg-green-600 w-16 h-16 rounded-3xl flex items-center justify-center text-5xl shadow-2xl z-[90]">
-    <i class="fab fa-whatsapp text-white"></i>
+  <!-- Floating WhatsApp -->
+  <a id="whatsappFloat" href="#" target="_blank" class="fixed bottom-6 right-6 bg-green-500 w-14 h-14 rounded-3xl flex items-center justify-center text-4xl shadow-2xl z-50">
+    <i class="fab fa-whatsapp"></i>
   </a>
 
-  <script>
-    // ============== FIREBASE CONFIG ==============
-    const firebaseConfig = {
-      apiKey: "AIzaSyA2zK-JYv2-Eg7HoxFB9RlmXbQzg6CwkzU",
-      authDomain: "may-gaming.firebaseapp.com",
-      projectId: "may-gaming",
-      storageBucket: "may-gaming.firebasestorage.app",
-      messagingSenderId: "1072630613356",
-      appId: "1:1072630613356:web:fa8cce006382186bf01f49"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    let currentUser = null;
-    let hasCompletedSocialGate = false;
-
-    // Theme Toggle (Torch Style)
-    const themeToggle = document.getElementById('themeToggle');
-    const toggleKnob = document.getElementById('toggleKnob');
-    const themeIcon = document.getElementById('themeIcon');
-
-    function setTheme(isDark) {
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-        toggleKnob.style.left = '36px';
-        themeIcon.classList.replace('fa-torch', 'fa-sun');
-        localStorage.theme = 'dark';
-      } else {
-        document.documentElement.classList.remove('dark');
-        toggleKnob.style.left = '4px';
-        themeIcon.classList.replace('fa-sun', 'fa-torch');
-        localStorage.theme = 'light';
-      }
-    }
-
-    themeToggle.addEventListener('click', () => {
-      const isDark = !document.documentElement.classList.contains('dark');
-      setTheme(isDark);
-    });
-
-    // Load saved theme
-    if (localStorage.theme === 'dark' || !('theme' in localStorage)) setTheme(true);
-    else setTheme(false);
-
-    // Show Login Page
-    function showLoginPage() {
-      const html = `
-        <div class="max-w-md mx-auto bg-white dark:bg-[#0a2a5e] rounded-3xl shadow-2xl p-12">
-          <h2 class="text-4xl font-bold text-center mb-10">MYA Gaming</h2>
-          <input id="loginEmail" type="email" placeholder="Email Address" class="w-full px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 mb-6"/>
-          <div class="relative mb-8">
-            <input id="loginPassword" type="password" placeholder="Password" class="w-full px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500"/>
-            <button id="toggleLoginPass" class="absolute right-6 top-1/2 -translate-y-1/2 text-2xl">👁️</button>
-          </div>
-          <button id="loginBtn" class="w-full py-5 bg-blue-600 hover:bg-blue-700 rounded-3xl text-white font-semibold text-xl mb-6">Login</button>
-          <button id="googleLoginBtn" class="w-full flex justify-center items-center gap-4 border border-gray-300 dark:border-gray-600 py-5 rounded-3xl hover:bg-gray-100 dark:hover:bg-gray-700 text-lg">
-            <i class="fab fa-google text-2xl"></i> Continue with Google
-          </button>
-          <p class="text-center mt-8 text-gray-500">New user? <button id="showRegisterBtn" class="text-blue-600 dark:text-cyan-400 font-medium">Register Now</button></p>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = html;
-
-      document.getElementById('loginBtn').onclick = loginWithEmail;
-      document.getElementById('googleLoginBtn').onclick = googleSignIn;
-      document.getElementById('showRegisterBtn').onclick = showRegisterPage;
-
-      // Password eye
-      const passInput = document.getElementById('loginPassword');
-      document.getElementById('toggleLoginPass').onclick = () => {
-        if (passInput.type === 'password') {
-          passInput.type = 'text';
-          document.getElementById('toggleLoginPass').innerHTML = '🙈';
-        } else {
-          passInput.type = 'password';
-          document.getElementById('toggleLoginPass').innerHTML = '👁️';
-        }
-      };
-    }
-
-    // Register Page (full fields + unique username check)
-    function showRegisterPage() {
-      const html = `
-        <div class="max-w-md mx-auto bg-white dark:bg-[#0a2a5e] rounded-3xl shadow-2xl p-12">
-          <h2 class="text-4xl font-bold text-center mb-10">Create Account</h2>
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <input id="firstName" placeholder="First Name" class="px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500"/>
-            <input id="lastName" placeholder="Last Name" class="px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500"/>
-          </div>
-          <div class="relative mb-6">
-            <input id="username" placeholder="Username (unique)" class="w-full px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500"/>
-            <span id="usernameStatus" class="absolute right-6 top-1/2 text-sm"></span>
-          </div>
-          <input id="regEmail" type="email" placeholder="Email" class="w-full px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 mb-6"/>
-          <input id="regPassword" type="password" placeholder="New Password" class="w-full px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 mb-6"/>
-          <input id="regConfirmPass" type="password" placeholder="Confirm Password" class="w-full px-6 py-5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 mb-10"/>
-          <button id="registerBtn" class="w-full py-5 bg-emerald-600 hover:bg-emerald-700 rounded-3xl text-white font-semibold text-xl">Register</button>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = html;
-
-      const usernameInput = document.getElementById('username');
-      usernameInput.onkeyup = checkUsernameAvailability;
-
-      document.getElementById('registerBtn').onclick = registerUser;
-    }
-
-    async function checkUsernameAvailability() {
-      const username = document.getElementById('username').value.trim();
-      if (username.length < 3) return;
-      const snap = await db.collection('users').where('username', '==', username).get();
-      const statusEl = document.getElementById('usernameStatus');
-      if (!snap.empty) {
-        statusEl.innerHTML = `<span class="text-red-500">Taken</span>`;
-      } else {
-        statusEl.innerHTML = `<span class="text-green-500">Available</span>`;
-      }
-    }
-
-    async function registerUser() {
-      const firstName = document.getElementById('firstName').value;
-      const lastName = document.getElementById('lastName').value;
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('regEmail').value;
-      const pass = document.getElementById('regPassword').value;
-      const confirm = document.getElementById('regConfirmPass').value;
-
-      if (pass !== confirm) return alert("Passwords do not match");
-      if (!username) return alert("Please choose username");
-
-      try {
-        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-        await db.collection('users').doc(cred.user.uid).set({
-          firstName, lastName, username, email, blocked: false, createdAt: new Date()
-        });
-        currentUser = cred.user;
-        checkSocialGateAndShowDashboard();
-      } catch (e) { alert(e.message); }
-    }
-
-    async function loginWithEmail() {
-      const email = document.getElementById('loginEmail').value;
-      const pass = document.getElementById('loginPassword').value;
-      try {
-        const cred = await auth.signInWithEmailAndPassword(email, pass);
-        currentUser = cred.user;
-        checkSocialGateAndShowDashboard();
-      } catch (e) { alert(e.message); }
-    }
-
-    async function googleSignIn() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        const result = await auth.signInWithPopup(provider);
-        currentUser = result.user;
-        // Save extra data if new user
-        const userRef = db.collection('users').doc(currentUser.uid);
-        const doc = await userRef.get();
-        if (!doc.exists) {
-          await userRef.set({ firstName: currentUser.displayName.split(' ')[0] || '', lastName: '', username: currentUser.email.split('@')[0], email: currentUser.email, blocked: false });
-        }
-        checkSocialGateAndShowDashboard();
-      } catch (e) { alert(e.message); }
-    }
-
-    function checkSocialGateAndShowDashboard() {
-      if (!hasCompletedSocialGate) {
-        showSocialGate();
-      } else {
-        showDashboard();
-      }
-    }
-
-    function showSocialGate() {
-      const html = `
-        <div class="max-w-2xl mx-auto bg-white dark:bg-[#0a2a5e] rounded-3xl shadow-2xl p-16 text-center">
-          <h2 class="text-4xl font-bold mb-12">Follow Us to Continue</h2>
-          <div class="grid grid-cols-3 gap-8">
-            <a href="https://youtube.com" target="_blank" class="block bg-red-600 text-white py-8 rounded-3xl text-2xl font-semibold">YouTube</a>
-            <a href="https://tiktok.com" target="_blank" class="block bg-black text-white py-8 rounded-3xl text-2xl font-semibold">TikTok</a>
-            <a href="https://whatsapp.com/channel" target="_blank" class="block bg-green-600 text-white py-8 rounded-3xl text-2xl font-semibold">WhatsApp Channel</a>
-          </div>
-          <button id="gateContinueBtn" class="mt-16 w-full py-6 bg-blue-600 hover:bg-blue-700 rounded-3xl text-white text-2xl font-semibold">I Have Followed All</button>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = html;
-      document.getElementById('gateContinueBtn').onclick = () => {
-        hasCompletedSocialGate = true;
-        showDashboard();
-      };
-    }
-
-    async function showDashboard() {
-      // Fetch games from Firestore
-      const snap = await db.collection('games').orderBy('createdAt', 'desc').get();
-      let gamesHTML = `<div class="flex gap-8 overflow-x-auto pb-8 snap-x">`;
-      snap.forEach(doc => {
-        const g = doc.data();
-        gamesHTML += `
-          <div onclick="window.open('${g.gameLink}','_blank')" class="game-card min-w-[260px] bg-white dark:bg-[#0a2a5e] rounded-3xl shadow-xl overflow-hidden cursor-pointer snap-center">
-            <img src="${g.iconUrl}" class="w-full h-48 object-cover">
-            <div class="p-6">
-              <h3 class="font-bold text-2xl mb-1">${g.name}</h3>
-              <a href="${g.tutorialLink}" target="_blank" class="text-blue-600 dark:text-cyan-400 text-sm flex items-center gap-2">Watch Tutorial <i class="fas fa-external-link-alt"></i></a>
-            </div>
-          </div>`;
-      });
-      gamesHTML += `</div>`;
-
-      let adminPanelHTML = '';
-      if (currentUser && currentUser.email === 'saabj5614@gmail.com') {
-        adminPanelHTML = `<div class="mt-16"><h2 class="text-3xl font-bold mb-6">Admin Panel</h2><!-- Full admin sections will load here --></div>`;
-      }
-
-      const html = `
-        <h2 class="text-4xl font-bold mb-8">Welcome back, ${currentUser.displayName || 'Player'}!</h2>
-        ${gamesHTML}
-        ${adminPanelHTML}
-      `;
-      document.getElementById('mainContent').innerHTML = html;
-
-      // Load profile menu games too
-      loadGamesInMenu();
-    }
-
-    async function loadGamesInMenu() {
-      const container = document.getElementById('gamesInMenu');
-      const snap = await db.collection('games').get();
-      let html = '';
-      snap.forEach(doc => {
-        const g = doc.data();
-        html += `
-          <div onclick="window.open('${g.gameLink}','_blank')" class="flex gap-5 items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-3xl cursor-pointer">
-            <img src="${g.iconUrl}" class="w-16 h-16 rounded-2xl">
-            <div>
-              <p class="font-semibold">${g.name}</p>
-              <p class="text-sm text-gray-500">${g.gameLink.includes('mediafire') ? 'MediaFire' : 'Play Store'}</p>
-            </div>
-          </div>`;
-      });
-      container.innerHTML = html || '<p class="text-center text-gray-400">No games yet</p>';
-    }
-
-    // Profile Menu
-    document.getElementById('profileBtn').addEventListener('click', () => {
-      document.getElementById('slideMenu').classList.add('open');
-    });
-    document.getElementById('closeMenu').addEventListener('click', () => {
-      document.getElementById('slideMenu').classList.remove('open');
-    });
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      auth.signOut().then(() => location.reload());
-    });
-
-    // Auth listener
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('profileBtn').innerHTML = '👤';
-        checkSocialGateAndShowDashboard();
-      } else {
-        showLoginPage();
-      }
-    });
-
-    // Initial load
-    showLoginPage();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
