@@ -1,541 +1,431 @@
 <!DOCTYPE html>
-<html lang="ur" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Gaming Store | May Gaming</title>
+    <title>MAY GAMING | Ultra Premium Store v2.0</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
-        /* --- PREMIUM CSS STYLING --- */
+        /* --- ADVANCED CSS VARIABLES --- */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #3b82f6; /* Premium Blue */
-            --accent-glow: rgba(59, 130, 246, 0.5);
-            --success: #10b981;
+            --bg-dark: #020617;
+            --bg-card: #0f172a;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --accent: #f472b6;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --success: #22c55e;
             --danger: #ef4444;
-            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-glow: 0 0 15px rgba(56, 189, 248, 0.4);
         }
 
-        /* Dark/Light Theme Classes */
-        body.light-mode {
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --glass: rgba(0, 0, 0, 0.05);
+        body.light-theme {
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-dim: #475569;
+            --glass-border: rgba(0, 0, 0, 0.1);
         }
 
+        /* --- GLOBAL STYLES --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            transition: background 0.3s, color 0.3s;
+            scroll-behavior: smooth;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
             overflow-x: hidden;
+            transition: background 0.5s ease;
         }
 
         .hidden { display: none !important; }
 
-        /* Auth Container */
-        .auth-wrapper {
-            height: 100vh;
+        /* --- PRE-LOADER --- */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-box {
+            width: 150px;
+            height: 150px;
+            border: 3px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at top right, var(--accent-glow), transparent);
         }
-
-        .auth-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid var(--glass);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .auth-card h2 { text-align: center; margin-bottom: 20px; font-weight: 800; }
-
-        .input-group { margin-bottom: 15px; position: relative; }
-        input {
-            width: 100%;
-            padding: 12px 15px;
-            background: var(--glass);
-            border: 1px solid var(--glass);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-        input:focus { border-color: var(--accent); outline: none; }
-
-        .pass-toggle {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--text-secondary);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .google-btn {
-            width: 100%;
-            padding: 12px;
-            background: white;
-            color: #000;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* Dashboard Layout */
-        #main-app { display: none; }
         
-        header {
+        .loader-inner {
+            width: 100px;
+            height: 100px;
+            border: 3px solid transparent;
+            border-bottom-color: var(--accent);
+            border-radius: 50%;
+            animation: spin-reverse 1.5s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin-reverse { to { transform: rotate(-360deg); } }
+
+        /* --- AUTHENTICATION UI --- */
+        .auth-overlay {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at top left, #0f172a, #020617);
+            padding: 20px;
+        }
+
+        .premium-card {
+            background: var(--bg-card);
+            padding: 50px;
+            border-radius: 40px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .premium-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-wrapper { margin-bottom: 20px; position: relative; }
+        .input-wrapper label { font-size: 0.8rem; color: var(--text-dim); display: block; margin-bottom: 5px; }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); box-shadow: var(--neon-glow); outline: none; }
+
+        .btn-premium {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn-premium:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(56, 189, 248, 0.4); }
+
+        /* --- DASHBOARD LAYOUT --- */
+        .app-container { display: none; }
+
+        .top-nav {
+            height: 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 5%;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--glass);
+            padding: 0 5%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 999;
+            border-bottom: 1px solid var(--glass-border);
         }
 
-        /* Sidebar Menu */
-        .sidebar {
+        .sidebar-nav {
             position: fixed;
-            right: -300px;
+            left: -320px;
             top: 0;
+            width: 300px;
             height: 100vh;
-            width: 280px;
-            background: var(--card-bg);
-            z-index: 1000;
-            padding: 20px;
-            transition: 0.4s;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+            background: var(--bg-card);
+            z-index: 2000;
+            padding: 40px 20px;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid var(--glass-border);
         }
-        .sidebar.active { right: 0; }
-        .menu-item {
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 12px;
+        .sidebar-nav.open { left: 0; }
+
+        .nav-item {
+            padding: 18px 25px;
+            margin-bottom: 8px;
+            border-radius: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 15px;
-        }
-        .menu-item:hover { background: var(--glass); }
-
-        /* Theme Toggle Button */
-        .theme-switch {
-            width: 50px;
-            height: 25px;
-            background: #334155;
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-        }
-        .theme-switch .circle {
-            width: 21px;
-            height: 21px;
-            background: white;
-            border-radius: 50%;
-            position: absolute;
-            top: 2px;
-            left: 2px;
+            color: var(--text-dim);
+            font-weight: 500;
             transition: 0.3s;
         }
-        body.light-mode .theme-switch .circle { left: 27px; background: #fbbf24; }
+        .nav-item i { font-size: 1.2rem; }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; box-shadow: var(--neon-glow); }
 
-        /* Gaming Store Grid */
-        .store-grid {
+        /* --- STORE ENGINE --- */
+        .main-view { padding: 40px 5%; max-width: 1600px; margin: 0 auto; }
+
+        .section-header { margin-bottom: 40px; }
+        .section-header h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 10px; }
+
+        .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            padding: 30px 5%;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
         }
 
-        .game-card {
-            background: var(--card-bg);
-            border-radius: 20px;
+        .game-card-ultra {
+            background: var(--bg-card);
+            border-radius: 30px;
             overflow: hidden;
-            border: 1px solid var(--glass);
-        }
-        .game-img { width: 100%; height: 180px; object-fit: cover; }
-        .game-info { padding: 20px; }
-        .game-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-sm { padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; flex: 1; text-align: center; text-decoration: none; color: white;}
-
-        /* Admin Panel Styles */
-        .admin-section { padding: 40px 5%; }
-        .admin-box { background: var(--card-bg); padding: 25px; border-radius: 20px; margin-bottom: 20px; }
-        .user-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid var(--glass);
+            border: 1px solid var(--glass-border);
+            transition: 0.4s ease;
         }
 
-        /* Floating WhatsApp Icon */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            background: #25d366;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            color: white;
-            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
-            z-index: 1000;
-            cursor: pointer;
-        }
+        .game-card-ultra:hover { transform: scale(1.03); border-color: var(--primary); }
 
+        .card-banner { height: 200px; overflow: hidden; position: relative; }
+        .card-banner img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .game-card-ultra:hover .card-banner img { transform: scale(1.1); }
+
+        .card-content { padding: 25px; }
+        .card-tag { background: var(--primary); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+
+        .action-group { display: flex; gap: 10px; margin-top: 20px; }
+        .action-btn { flex: 1; padding: 12px; border-radius: 12px; text-decoration: none; text-align: center; font-size: 0.9rem; font-weight: 600; }
+
+        /* --- ADMIN INTERFACE --- */
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
+
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-card); padding: 20px; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border); }
+        .stat-card h4 { color: var(--text-dim); font-size: 0.8rem; }
+        .stat-card div { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+
+        .table-container { width: 100%; overflow-x: auto; background: var(--bg-card); border-radius: 20px; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; color: var(--text-dim); border-bottom: 1px solid var(--glass-border); }
+        td { padding: 15px; border-bottom: 1px solid var(--glass-border); font-size: 0.9rem; }
+
+        /* --- FLOATING ELEMENTS --- */
+        #wa-widget {
+            position: fixed; bottom: 30px; right: 30px; 
+            width: 65px; height: 65px; border-radius: 50%;
+            background: #25d366; color: white; 
+            display: flex; justify-content: center; align-items: center;
+            font-size: 30px; cursor: pointer; z-index: 3000;
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+        }
     </style>
 </head>
-<body id="body">
+<body id="app-body">
 
-    <div id="auth-page" class="auth-wrapper">
-        <div class="auth-card" id="login-form">
-            <h2>لاگ ان</h2>
-            <div class="input-group">
-                <input type="email" id="l-email" placeholder="ای میل">
+    <div id="loading-screen">
+        <div class="loader-box">
+            <div class="loader-inner"></div>
+        </div>
+        <h2 style="margin-top: 20px; letter-spacing: 5px; font-family: 'Orbitron';">LOADING...</h2>
+    </div>
+
+    <div id="auth-layer" class="auth-overlay">
+        <div class="premium-card animate__animated animate__zoomIn" id="login-container">
+            <h2>LOGIN PORTAL</h2>
+            <div class="input-wrapper">
+                <label>Registered Email</label>
+                <input type="email" id="l-email" placeholder="example@mail.com">
             </div>
-            <div class="input-group">
-                <input type="password" id="l-pass" placeholder="پاس ورڈ">
-                <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('l-pass')"></i>
+            <div class="input-wrapper">
+                <label>Access Password</label>
+                <input type="password" id="l-pass" placeholder="••••••••">
             </div>
-            <button class="btn-primary" onclick="handleLogin()">لاگ ان کریں</button>
-            <div class="google-btn" onclick="googleSignIn()"><img src="https://img.icons8.com/color/24/google-logo.png"/> گوگل سائن اپ</div>
-            <p style="text-align: center; margin-top: 15px; font-size: 13px;">اکاؤنٹ نہیں ہے؟ <span style="color: var(--accent); cursor: pointer;" onclick="toggleAuth()">رجسٹر کریں</span></p>
+            <button class="btn-premium" onclick="auth_login()">ENTER SYSTEM</button>
+            <button class="google-btn" onclick="auth_google()" style="margin-top: 15px; background: white; color: black; border: none; width: 100%; padding: 12px; border-radius: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="https://img.icons8.com/color/24/google-logo.png"/> LOGIN WITH GOOGLE
+            </button>
+            <p style="text-align:center; margin-top:25px; font-size:0.85rem">Need access? <span style="color:var(--primary); cursor:pointer" onclick="switch_auth('reg')">Request Account</span></p>
         </div>
 
-        <div class="auth-card hidden" id="register-form">
-            <h2>رجسٹر کریں</h2>
-            <div class="input-group" style="display: flex; gap: 10px;">
-                <input type="text" id="fname" placeholder="پہلا نام">
-                <input type="text" id="lname" placeholder="آخری نام">
+        <div class="premium-card animate__animated animate__zoomIn hidden" id="register-container">
+            <h2>REGISTRATION</h2>
+            <div style="display: flex; gap: 15px;">
+                <div class="input-wrapper" style="flex:1">
+                    <label>First Name</label>
+                    <input type="text" id="r-fname">
+                </div>
+                <div class="input-wrapper" style="flex:1">
+                    <label>Last Name</label>
+                    <input type="text" id="r-lname">
+                </div>
             </div>
-            <div class="input-group">
-                <input type="text" id="username" placeholder="یوزر نیم (small letters)" oninput="checkUsername(this.value)">
-                <small id="user-hint" style="font-size: 10px;"></small>
+            <div class="input-wrapper">
+                <label>Unique Username</label>
+                <input type="text" id="r-uname" placeholder="gamer_tag_01">
             </div>
-            <div class="input-group">
-                <input type="email" id="r-email" placeholder="ای میل">
+            <div class="input-wrapper">
+                <label>Email</label>
+                <input type="email" id="r-email">
             </div>
-            <div class="input-group">
-                <input type="password" id="r-pass" placeholder="پاس ورڈ">
-                <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('r-pass')"></i>
+            <div class="input-wrapper">
+                <label>Security Password</label>
+                <input type="password" id="r-pass">
             </div>
-            <div class="input-group">
-                <input type="password" id="r-conf-pass" placeholder="پاس ورڈ کی تصدیق">
-                <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('r-conf-pass')"></i>
-            </div>
-            <button class="btn-primary" onclick="handleRegister()">رجسٹر کریں</button>
-            <p style="text-align: center; margin-top: 15px; font-size: 13px;">پہلے سے اکاؤنٹ ہے؟ <span style="color: var(--accent); cursor: pointer;" onclick="toggleAuth()">لاگ ان کریں</span></p>
+            <button class="btn-premium" onclick="auth_register()">CREATE ACCOUNT</button>
+            <p style="text-align:center; margin-top:25px; font-size:0.85rem">Already a member? <span style="color:var(--primary); cursor:pointer" onclick="switch_auth('log')">Login</span></p>
         </div>
     </div>
 
-    <div id="main-app">
-        <header>
-            <div class="nav-right" style="display: flex; align-items: center; gap: 20px;">
-                <i class="fa-solid fa-bars" style="font-size: 24px; cursor: pointer;" onclick="toggleSidebar()"></i>
-                <h2 style="letter-spacing: 2px;">MAY GAMING</h2>
+    <div id="main-app" class="app-container">
+        
+        <header class="top-nav">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <i class="fa-solid fa-bars-staggered" style="font-size:24px; cursor:pointer" onclick="toggle_menu()"></i>
+                <h2 style="font-family:'Orbitron'; color:var(--primary)">MAY GAMING</h2>
             </div>
-            <div class="nav-left">
-                <div class="theme-switch" onclick="toggleTheme()">
-                    <div class="circle"></div>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div class="theme-switch" onclick="toggle_theme()" style="width:50px; height:25px; background:#334155; border-radius:20px; position:relative; cursor:pointer;">
+                    <div id="theme-ball" style="width:21px; height:21px; background:white; border-radius:50%; position:absolute; top:2px; left:2px; transition:0.3s;"></div>
                 </div>
+                <div id="admin-badge" class="hidden" style="background:var(--accent); color:black; font-size:10px; font-weight:800; padding:4px 10px; border-radius:5px;">ADMIN MODE</div>
             </div>
         </header>
 
-        <div class="sidebar" id="sidebar">
-            <div class="profile-section" style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--glass);">
-                <div id="user-dp" style="width: 80px; height: 80px; background: var(--accent); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px;">👤</div>
-                <h3 id="display-name">Username</h3>
+        <nav class="sidebar-nav" id="sidebar">
+            <div style="text-align:center; padding-bottom:30px; border-bottom:1px solid var(--glass-border); margin-bottom:20px;">
+                <div id="nav-pfp" style="width:80px; height:80px; background:linear-gradient(45deg, var(--primary), var(--secondary)); border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:35px; border:3px solid var(--glass-border);">👤</div>
+                <h3 id="nav-name">Gamer Name</h3>
+                <p id="nav-handle" style="color:var(--primary); font-size:0.8rem">@username</p>
             </div>
-            <div class="menu-item" onclick="showSection('dashboard')"><i class="fa-solid fa-house"></i> ڈیش بورڈ</div>
-            <div class="menu-item" onclick="showSection('store')"><i class="fa-solid fa-gamepad"></i> گیم سٹور</div>
-            <div class="menu-item" onclick="showSection('profile')"><i class="fa-solid fa-user-gear"></i> پروفائل سیٹنگ</div>
-            <div id="admin-menu-btn" class="menu-item hidden" onclick="showSection('admin')"><i class="fa-solid fa-lock"></i> ایڈمن پینل</div>
-            <div class="menu-item" style="color: var(--danger); margin-top: 50px;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> لاگ آؤٹ</div>
-        </div>
+            <div class="nav-item active" onclick="nav_to('dashboard')"><i class="fa-solid fa-house"></i> Overview</div>
+            <div class="nav-item" onclick="nav_to('store')"><i class="fa-solid fa-gamepad"></i> Game Store</div>
+            <div class="nav-item" onclick="nav_to('settings')"><i class="fa-solid fa-user-gear"></i> Profile Settings</div>
+            <div class="nav-item hidden" id="nav-admin" onclick="nav_to('admin')"><i class="fa-solid fa-shield-halved"></i> Control Panel</div>
+            <div class="nav-item" onclick="sys_logout()" style="margin-top:auto; color:var(--danger)"><i class="fa-solid fa-power-off"></i> System Exit</div>
+        </nav>
 
-        <main id="content-area">
-            <section id="dashboard-sec" class="admin-section">
-                <h1>خوش آمدید!</h1>
-                <div id="dashboard-list" class="store-grid">
-                    </div>
-            </section>
-
-            <section id="store-sec" class="admin-section hidden">
-                <div class="input-group">
-                    <input type="text" id="gameSearch" placeholder="گیم تلاش کریں..." onkeyup="searchGame()">
+        <main class="main-view">
+            
+            <section id="view-dashboard" class="content-view">
+                <div class="section-header">
+                    <p style="color:var(--primary); font-weight:700;">WELCOME BACK</p>
+                    <h1>RECENT UPDATES</h1>
                 </div>
-                <div id="store-list" class="store-grid">
+                <div id="feed-container" class="game-grid">
                     </div>
             </section>
 
-            <section id="admin-sec" class="admin-section hidden">
-                <h2>ایڈمن کنٹرول پینل</h2>
-                
-                <div class="admin-box">
-                    <h3>یوزرز مینیج کریں</h3>
-                    <div id="user-management-list">
+            <section id="view-store" class="content-view hidden">
+                <div class="section-header">
+                    <h1>GLOBAL STORE</h1>
+                    <div style="position:relative; margin-top:20px;">
+                        <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:20px; top:18px; color:var(--text-dim)"></i>
+                        <input type="text" id="game-search" onkeyup="search_games()" placeholder="Search from thousands of titles..." style="padding-left:55px;">
+                    </div>
+                </div>
+                <div id="store-container" class="game-grid"></div>
+            </section>
+
+            <section id="view-admin" class="content-view hidden">
+                <div class="section-header">
+                    <h1>ADMIN CONTROL</h1>
+                    <p>System Management & Global Settings</p>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card"><h4>Users</h4><div id="stat-users">0</div></div>
+                    <div class="stat-card"><h4>Games</h4><div id="stat-games">0</div></div>
+                    <div class="stat-card"><h4>Access</h4><div style="color:var(--success)">STABLE</div></div>
+                </div>
+
+                <div class="admin-grid">
+                    <div class="admin-box" style="background:var(--bg-card); padding:30px; border-radius:20px; border:1px solid var(--glass-border)">
+                        <h3>Add New Title</h3>
+                        <div class="input-wrapper"><input type="text" id="adm-g-icon" placeholder="Icon Image URL"></div>
+                        <div class="input-wrapper"><input type="text" id="adm-g-title" placeholder="Game Title"></div>
+                        <div class="input-wrapper"><input type="text" id="adm-g-video" placeholder="Video Preview Link"></div>
+                        <div class="input-wrapper"><input type="text" id="adm-g-dl" placeholder="Direct Download Link"></div>
+                        <textarea id="adm-g-desc" placeholder="Product Description..." style="height:120px;"></textarea>
+                        <button class="btn-premium" onclick="db_add_game()" style="margin-top:20px;">PUBLISH NOW</button>
+                    </div>
+
+                    <div class="admin-box" style="background:var(--bg-card); padding:30px; border-radius:20px; border:1px solid var(--glass-border)">
+                        <h3>Access Management</h3>
+                        <div class="table-container">
+                            <table id="user-table">
+                                <thead><tr><th>User</th><th>Status</th><th>Action</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
+                    </div>
                 </div>
 
-                <div class="admin-box">
-                    <h3>نئی گیم شامل کریں</h3>
-                    <input type="text" id="g-icon" placeholder="گیم آئیکن یو آر ایل (Image URL)">
-                    <input type="text" id="g-title" placeholder="گیم کا نام">
-                    <input type="text" id="g-video" placeholder="یوٹیوب ویڈیو لنک">
-                    <input type="text" id="g-download" placeholder="ڈاؤن لوڈ لنک (Mediafire/Playstore)">
-                    <textarea id="g-desc" placeholder="گیم ڈسکرپشن" style="width:100%; height:100px; background:var(--glass); border:none; margin-top:10px; border-radius:12px; color:white; padding:10px;"></textarea>
-                    <button class="btn-primary" onclick="addGame()">گیم ایڈ کریں</button>
-                </div>
-
-                <div class="admin-box">
-                    <h3>سوشل لنکس اپڈیٹ کریں</h3>
-                    <input type="text" id="link-tiktok" placeholder="TikTok Link">
-                    <input type="text" id="link-youtube" placeholder="YouTube Link">
-                    <input type="text" id="link-whatsapp" placeholder="WhatsApp Number">
-                    <button class="btn-primary" onclick="updateSocials()">لنک سیٹ کریں</button>
+                <div class="admin-box" style="background:var(--bg-card); padding:30px; border-radius:20px; border:1px solid var(--glass-border); margin-top:30px;">
+                    <h3>Social API Links</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px;">
+                        <input type="text" id="api-tiktok" placeholder="TikTok Link">
+                        <input type="text" id="api-yt" placeholder="YouTube Link">
+                        <input type="text" id="api-wa" placeholder="WhatsApp Number">
+                    </div>
+                    <button class="btn-premium" onclick="db_save_socials()" style="margin-top:20px;">SAVE SETTINGS</button>
                 </div>
             </section>
 
-            <section id="profile-sec" class="admin-section hidden">
-                <div class="admin-box">
-                    <h3>پروفائل اپڈیٹ کریں</h3>
-                    <input type="text" id="up-fname" placeholder="نیا نام">
-                    <button class="btn-primary" onclick="updateProfile()">تبدیل کریں</button>
+            <section id="view-settings" class="content-view hidden">
+                <div class="section-header"><h1>PROFILE SETTINGS</h1></div>
+                <div class="premium-card" style="max-width:100%">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+                        <div class="input-wrapper"><label>Full Name</label><input type="text" id="set-name"></div>
+                        <div class="input-wrapper"><label>Email</label><input type="email" id="set-email"></div>
+                        <div class="input-wrapper"><label>New Password</label><input type="password" id="set-pass"></div>
+                    </div>
+                    <button class="btn-premium" onclick="sys_update_user()" style="width:200px">UPDATE INFO</button>
                 </div>
             </section>
+
         </main>
+    </div>
 
-        <div class="whatsapp-float" id="wa-btn" onclick="openWhatsApp()">
-            <i class="fa-brands fa-whatsapp"></i>
-        </div>
+    <div id="wa-widget" class="hidden" onclick="open_wa()">
+        <i class="fa-brands fa-whatsapp"></i>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
         import { getDatabase, ref, set, get, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-        // Your Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyA2zK-JYv2-Eg7HoxFB9RlmXbQzg6CwkzU",
-            authDomain: "may-gaming.firebaseapp.com",
-            databaseURL: "https://may-gaming-default-rtdb.firebaseio.com",
-            projectId: "may-gaming",
-            storageBucket: "may-gaming.firebasestorage.app",
-            messagingSenderId: "1072630613356",
-            appId: "1:1072630613356:web:fa8cce006382186bf01f49"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-
-        const ADMIN_EMAIL = "saabj5614@gmail.com";
-
-        // --- AUTH LOGIC ---
-        window.handleLogin = () => {
-            const email = document.getElementById('l-email').value;
-            const pass = document.getElementById('l-pass').value;
-            signInWithEmailAndPassword(auth, email, pass)
-                .then((user) => {
-                    checkIfBlocked(user.user.uid);
-                })
-                .catch(err => alert("Error: " + err.message));
-        };
-
-        window.handleRegister = async () => {
-            const email = document.getElementById('r-email').value;
-            const pass = document.getElementById('r-pass').value;
-            const userN = document.getElementById('username').value.toLowerCase();
-            const fullName = document.getElementById('fname').value + " " + document.getElementById('lname').value;
-
-            if(!userN) return alert("Username is required");
-
-            createUserWithEmailAndPassword(auth, email, pass)
-                .then((res) => {
-                    set(ref(db, 'users/' + res.user.uid), {
-                        username: userN,
-                        name: fullName,
-                        email: email,
-                        status: 'active',
-                        role: email === ADMIN_EMAIL ? 'admin' : 'user'
-                    });
-                    alert("Account Created!");
-                })
-                .catch(err => alert(err.message));
-        };
-
-        function checkIfBlocked(uid) {
-            get(ref(db, 'users/' + uid)).then(snap => {
-                if(snap.exists() && snap.val().status === 'blocked') {
-                    alert("Your account is blocked by admin.");
-                    signOut(auth);
-                }
-            });
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('auth-page').classList.add('hidden');
-                document.getElementById('main-app').style.display = 'block';
-                if(user.email === ADMIN_EMAIL) document.getElementById('admin-menu-btn').classList.remove('hidden');
-                loadData();
-                loadUsersForAdmin();
-            } else {
-                document.getElementById('auth-page').classList.remove('hidden');
-                document.getElementById('main-app').style.display = 'none';
-            }
-        });
-
-        // --- CORE FUNCTIONS ---
-        window.addGame = () => {
-            const id = Date.now();
-            set(ref(db, 'games/' + id), {
-                icon: document.getElementById('g-icon').value,
-                title: document.getElementById('g-title').value,
-                video: document.getElementById('g-video').value,
-                download: document.getElementById('g-download').value,
-                desc: document.getElementById('g-desc').value
-            });
-            alert("Game Added!");
-        };
-
-        function loadData() {
-            onValue(ref(db, 'games'), (snap) => {
-                const data = snap.val();
-                let storeHtml = '';
-                let dashHtml = '';
-                for(let id in data) {
-                    // Dashboard Card (Simple)
-                    dashHtml += `
-                        <div class="game-card">
-                            <img src="${data[id].icon}" class="game-img">
-                            <div class="game-info">
-                                <h3>${data[id].title}</h3>
-                                <p style="font-size:12px; color:var(--text-secondary)">${data[id].desc}</p>
-                            </div>
-                        </div>`;
-                    
-                    // Store Card (Full)
-                    storeHtml += `
-                        <div class="game-card">
-                            <img src="${data[id].icon}" class="game-img">
-                            <div class="game-info">
-                                <h3>${data[id].title}</h3>
-                                <div class="game-actions">
-                                    <a href="${data[id].download}" class="btn-sm" style="background:var(--success)">Install</a>
-                                    <a href="${data[id].video}" class="btn-sm" style="background:var(--accent)">Video</a>
-                                </div>
-                            </div>
-                        </div>`;
-                }
-                document.getElementById('dashboard-list').innerHTML = dashHtml;
-                document.getElementById('store-list').innerHTML = storeHtml;
-            });
-        }
-        function loadUsersForAdmin() {
-            onValue(ref(db, 'users'), (snap) => {
-                const users = snap.val();
-                let html = '';
-                for(let id in users) {
-                    if(users[id].email === ADMIN_EMAIL) continue;
-                    const btnText = users[id].status === 'active' ? 'Block' : 'Unblock';
-                    const btnColor = users[id].status === 'active' ? 'var(--danger)' : 'var(--success)';
-                    html += `
-                        <div class="user-row">
-                            <span>${users[id].username} (${users[id].email})</span>
-                            <button onclick="toggleUserStatus('${id}', '${users[id].status}')" style="background:${btnColor}; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">${btnText}</button>
-                        </div>`;
-                }
-                document.getElementById('user-management-list').innerHTML = html;
-            });
-        }
-
-        window.toggleUserStatus = (uid, currentStatus) => {
-            const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
-            update(ref(db, 'users/' + uid), { status: newStatus });
-        };
-
-        window.logout = () => signOut(auth);
-    </script>
-
-    <script>
-        // --- UI UTILITIES ---
-        function togglePass(id) {
-            const el = document.getElementById(id);
-            el.type = el.type === 'password' ? 'text' : 'password';
-        }
-
-        function toggleAuth() {
-            document.getElementById('login-form').classList.toggle('hidden');
-            document.getElementById('register-form').classList.toggle('hidden');
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
-
-        function toggleTheme() {
-            document.getElementById('body').classList.toggle('light-mode');
-        }
-
-        function showSection(sec) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(sec + '-sec').classList.remove('hidden');
-            toggleSidebar();
-        }
-
-        function searchGame() {
-            let filter = document.getElementById('gameSearch').value.toUpperCase();
-            let cards = document.querySelectorAll('#store-list .game-card');
-            cards.forEach(card => {
-                let h3 = card.getElementsByTagName('h3')[0];
-                card.style.display = h3.innerText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            });
-        }
-    </script>
-</body>
-</html>
+       
