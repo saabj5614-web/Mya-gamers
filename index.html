@@ -476,7 +476,6 @@
                 document.getElementById('store-list').innerHTML = storeHtml;
             });
         }
-
         function loadUsersForAdmin() {
             onValue(ref(db, 'users'), (snap) => {
                 const users = snap.val();
@@ -488,4 +487,55 @@
                     html += `
                         <div class="user-row">
                             <span>${users[id].username} (${users[id].email})</span>
-   
+                            <button onclick="toggleUserStatus('${id}', '${users[id].status}')" style="background:${btnColor}; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">${btnText}</button>
+                        </div>`;
+                }
+                document.getElementById('user-management-list').innerHTML = html;
+            });
+        }
+
+        window.toggleUserStatus = (uid, currentStatus) => {
+            const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
+            update(ref(db, 'users/' + uid), { status: newStatus });
+        };
+
+        window.logout = () => signOut(auth);
+    </script>
+
+    <script>
+        // --- UI UTILITIES ---
+        function togglePass(id) {
+            const el = document.getElementById(id);
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+
+        function toggleAuth() {
+            document.getElementById('login-form').classList.toggle('hidden');
+            document.getElementById('register-form').classList.toggle('hidden');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function toggleTheme() {
+            document.getElementById('body').classList.toggle('light-mode');
+        }
+
+        function showSection(sec) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(sec + '-sec').classList.remove('hidden');
+            toggleSidebar();
+        }
+
+        function searchGame() {
+            let filter = document.getElementById('gameSearch').value.toUpperCase();
+            let cards = document.querySelectorAll('#store-list .game-card');
+            cards.forEach(card => {
+                let h3 = card.getElementsByTagName('h3')[0];
+                card.style.display = h3.innerText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            });
+        }
+    </script>
+</body>
+</html>
