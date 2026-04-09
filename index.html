@@ -424,8 +424,207 @@
     </div>
 
     <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
         import { getDatabase, ref, set, get, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
-       
+        // CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2zK-JYv2-Eg7HoxFB9RlmXbQzg6CwkzU",
+            authDomain: "may-gaming.firebaseapp.com",
+            databaseURL: "https://may-gaming-default-rtdb.firebaseio.com",
+            projectId: "may-gaming",
+            storageBucket: "may-gaming.firebasestorage.app",
+            messagingSenderId: "1072630613356",
+            appId: "1:1072630613356:web:fa8cce006382186bf01f49"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+        const ADMIN_EMAIL = "saabj5614@gmail.com";
+
+        // AUTHENTICATION LOGIC
+        window.auth_login = () => {
+            const e = document.getElementById('l-email').value;
+            const p = document.getElementById('l-pass').value;
+            signInWithEmailAndPassword(auth, e, p).catch(err => alert("Access Denied: " + err.message));
+        };
+
+        window.auth_register = () => {
+            const email = document.getElementById('r-email').value;
+            const pass = document.getElementById('r-pass').value;
+            const uname = document.getElementById('r-uname').value.toLowerCase();
+            const fullName = document.getElementById('r-fname').value + " " + document.getElementById('r-lname').value;
+
+            createUserWithEmailAndPassword(auth, email, pass).then(res => {
+                set(ref(db, 'users/' + res.user.uid), {
+                    name: fullName, username: uname, email: email, status: 'active', role: 'user'
+                });
+            }).catch(err => alert(err.message));
+        };
+
+        window.auth_google = () => {
+            signInWithPopup(auth, googleProvider).then(res => {
+                const u = res.user;
+                get(ref(db, 'users/' + u.uid)).then(s => {
+                    if(!s.exists()) {
+                        set(ref(db, 'users/' + u.uid), {
+                            name: u.displayName, email: u.email, username: u.email.split('@')[0], status: 'active', role: 'user'
+                        });
+                    }
+                });
+            });
+        };
+
+        onAuthStateChanged(auth, user => {
+            if(user) {
+                get(ref(db, 'users/' + user.uid)).then(snap => {
+                    const data = snap.val();
+                    if(data && data.status === 'blocked') {
+                        alert("Your account is suspended.");
+                        signOut(auth);
+                        return;
+                    }
+                    document.getElementById('auth-layer').classList.add('hidden');
+                    document.getElementById('main-app').style.display = 'block';
+                    
+                    document.getElementById('nav-name').innerText = data?.name || "Member";
+                    document.getElementById('nav-handle').innerText = "@" + (data?.username || "user");
+                    
+                    if(user.email === ADMIN_EMAIL) {
+                        document.getElementById('nav-admin').classList.remove('hidden');
+                        document.getElementById('admin-badge').classList.remove('hidden');
+                    }
+                    sys_load_data();
+                });
+            } else {
+                document.getElementById('auth-layer').classList.remove('hidden');
+                document.getElementById('main-app').style.display = 'none';
+            }
+            setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1500);
+        });
+
+        // SYSTEM CORE
+        function sys_load_data() {
+            onValue(ref(db, 'games'), snap => {
+                const games = snap.val();
+                let feedHtml = '', storeHtml = '', count = 0;
+                for(let id in games) {
+                    const g = games[id];
+                    count++;
+                    const card = `
+                        <div class="game-card-ultra">
+                            <div class="card-banner"><img src="${g.icon}"></div>
+                            <div class="card-content">
+                                <span class="card-tag">Verified</span>
+                                <h3 style="margin:10px 0;">${g.title}</h3>
+                                <p style="font-size:0.8rem; color:var(--text-dim)">${g.desc}</p>
+                                <div class="action-group">
+                                    <a href="${g.dl}" class="action-btn" style="background:var(--primary); color:#000;">DOWNLOAD</a>
+                                    <a href="${g.video}" class="action-btn" style="border:1px solid var(--glass-border); color:white;">TRAILER</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    storeHtml += card;
+                    feedHtml += card; // In real case, feed could be different
+                }
+                document.getElementById('feed-container').innerHTML = feedHtml;
+                document.getElementById('store-container').innerHTML = storeHtml;
+                document.getElementById('stat-games').innerText = count;
+            });
+
+            // Load Users for Admin
+            if(auth.currentUser?.email === ADMIN_EMAIL) {
+                onValue(ref(db, 'users'), snap => {
+                    const users = snap.val();
+                    let rows = '', count = 0;
+                    for(let id in users) {
+                        if(users[id].email === ADMIN_EMAIL) continue;
+                        count++;
+                        const isBlocked = users[id].status === 'blocked';
+                        rows += `<tr>
+                            <td>${users[id].username}</td>
+                            <td style="color:${isBlocked?'red':'green'}">${users[id].status}</td>
+                            <td><button onclick="db_toggle_user('${id}', '${users[id].status}')" style="background:${isBlocked?'var(--success)':'var(--danger)'}; border:none; padding:5px 10px; border-radius:5px; color:white; cursor:pointer;">${isBlocked?'Unblock':'Block'}</button></td>
+                        </tr>`;
+                    }
+                    document.getElementById('user-table').querySelector('tbody').innerHTML = rows;
+                    document.getElementById('stat-users').innerText = count;
+                });
+            }
+
+            // Social Settings
+            onValue(ref(db, 'settings/socials'), snap => {
+                const s = snap.val();
+                if(s) {
+                    window.current_wa = s.whatsapp;
+                    document.getElementById('wa-widget').classList.remove('hidden');
+                }
+            });
+        }
+
+        window.db_add_game = () => {
+            const id = Date.now();
+            set(ref(db, 'games/' + id), {
+                id, icon: document.getElementById('adm-g-icon').value,
+                title: document.getElementById('adm-g-title').value,
+                video: document.getElementById('adm-g-video').value,
+                dl: document.getElementById('adm-g-dl').value,
+                desc: document.getElementById('adm-g-desc').value
+            });
+            alert("Success: Title Live!");
+        };
+
+        window.db_toggle_user = (uid, s) => {
+            update(ref(db, 'users/' + uid), { status: s === 'active' ? 'blocked' : 'active' });
+        };
+
+        window.db_save_socials = () => {
+            set(ref(db, 'settings/socials'), {
+                tiktok: document.getElementById('api-tiktok').value,
+                youtube: document.getElementById('api-yt').value,
+                whatsapp: document.getElementById('api-wa').value
+            });
+            alert("API Links Updated!");
+        };
+
+        window.sys_logout = () => signOut(auth);
+    </script>
+
+    <script>
+        // UI HELPERS
+        function toggle_menu() { document.getElementById('sidebar').classList.toggle('open'); }
+        
+        function toggle_theme() {
+            document.body.classList.toggle('light-theme');
+            const ball = document.getElementById('theme-ball');
+            ball.style.left = document.body.classList.contains('light-theme') ? '27px' : '2px';
+        }
+
+        function switch_auth(mode) {
+            document.getElementById('login-container').classList.toggle('hidden', mode === 'reg');
+            document.getElementById('register-container').classList.toggle('hidden', mode === 'log');
+        }
+
+        function nav_to(view) {
+            document.querySelectorAll('.content-view').forEach(v => v.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('view-' + view).classList.remove('hidden');
+            toggle_menu();
+        }
+
+        function search_games() {
+            let filter = document.getElementById('game-search').value.toLowerCase();
+            document.querySelectorAll('#store-container .game-card-ultra').forEach(c => {
+                c.style.display = c.innerText.toLowerCase().includes(filter) ? "" : "none";
+            });
+        }
+
+        function open_wa() { window.open(`https://wa.me/${window.current_wa}`, '_blank'); }
+    </script>
+
+</body>
+</html>
